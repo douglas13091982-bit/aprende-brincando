@@ -16,26 +16,1239 @@
   <meta name="msapplication-TileColor" content="#FF6B9D" />
   <meta name="msapplication-tap-highlight" content="no" />
   
-  <!-- Icons -->
+  <!-- Icons (optional - page works without them) -->
   <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-72.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-152.png" />
-  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* NOTE: Full styles and game code are in the complete version. This is a placeholder for size. The full file was prepared. */
-    body { font-family: system-ui; text-align: center; padding: 2rem; background: linear-gradient(160deg, #FFF0F5, #E8F4FF); min-height: 100vh; }
-    h1 { color: #FF6B9D; }
+    :root {
+      --sunny: #FFD166;
+      --coral: #FF6B9D;
+      --mint: #06D6A0;
+      --sky: #4ECDC4;
+      --lavender: #A78BFA;
+      --cream: #FFF9F0;
+      --soft-pink: #FFE4EC;
+      --deep: #2D3436;
+      --white: #FFFFFF;
+      --card-shadow: 0 12px 32px rgba(255, 107, 157, 0.18);
+      --card-shadow-hover: 0 20px 48px rgba(255, 107, 157, 0.28);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      background: linear-gradient(160deg, #FFF0F5 0%, #E8F4FF 40%, #FFF8E7 100%);
+      min-height: 100vh;
+      color: var(--deep);
+      overflow-x: hidden;
+      position: relative;
+      padding-top: env(safe-area-inset-top);
+    }
+
+    .screen { display: none; min-height: 100vh; position: relative; z-index: 2; }
+    .screen.active { display: block; }
+
+    .bg-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 420px; height: 420px; background: #FFB3C6; top: -120px; left: -100px; }
+    .blob-2 { width: 380px; height: 380px; background: #A5F3E0; bottom: 10%; right: -80px; }
+    .blob-3 { width: 280px; height: 280px; background: #C4B5FD; top: 40%; left: 5%; opacity: 0.3; }
+
+    .float-item {
+      position: fixed;
+      font-size: 1.5rem;
+      opacity: 0.5;
+      animation: float 7s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .float-1 { top: 12%; left: 6%; }
+    .float-2 { top: 20%; right: 8%; animation-delay: 1.2s; }
+    .float-3 { top: 55%; left: 3%; animation-delay: 2.4s; }
+    .float-4 { bottom: 25%; right: 5%; animation-delay: 0.8s; }
+    .float-5 { top: 70%; left: 15%; animation-delay: 3s; }
+    .float-6 { top: 15%; left: 50%; animation-delay: 1.8s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-16px) rotate(8deg); }
+    }
+
+    .hero {
+      text-align: center;
+      padding: 2.2rem 1.5rem 1.2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .mascot-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.6rem;
+      position: relative;
+    }
+
+    .mascot {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(145deg, #FFD166, #FFB347);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 28px rgba(255, 179, 71, 0.45);
+      animation: bounce-soft 3.2s ease-in-out infinite;
+      position: relative;
+    }
+    .mascot::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 209, 102, 0.4);
+      animation: pulse-ring 2.5s ease-out infinite;
+    }
+    @keyframes bounce-soft {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-9px); }
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(1.25); opacity: 0; }
+    }
+    .owl { font-size: 3.4rem; line-height: 1; }
+
+    .sparkle {
+      position: absolute;
+      font-size: 1.2rem;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+    .sparkle-1 { top: -6px; right: -10px; }
+    .sparkle-2 { bottom: 2px; left: -12px; animation-delay: 0.7s; }
+    @keyframes sparkle {
+      0%, 100% { transform: scale(1) rotate(0); opacity: 1; }
+      50% { transform: scale(1.3) rotate(15deg); opacity: 0.7; }
+    }
+
+    h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: clamp(2.4rem, 6.5vw, 3.8rem);
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(120deg, #FF6B9D 0%, #A78BFA 45%, #4ECDC4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #5A4A6A;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(8px);
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    .subjects {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.4rem;
+      max-width: 860px;
+      margin: 1.8rem auto 0;
+      padding: 0 1.2rem;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 26px;
+      padding: 1.4rem 1.3rem 1.3rem;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+      border: 3px solid transparent;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: var(--card-shadow-hover);
+    }
+    .card.math {
+      background: linear-gradient(145deg, #F0F9FF 0%, #E0F2FE 100%);
+      border-color: #7DD3FC;
+    }
+    .card.portuguese {
+      background: linear-gradient(145deg, #FFF1F5 0%, #FFE4EC 100%);
+      border-color: #FDA4AF;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.6rem;
+    }
+    .icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.1);
+    }
+    .math .icon-box { background: linear-gradient(135deg, #38BDF8, #0EA5E9); color: white; }
+    .portuguese .icon-box { background: linear-gradient(135deg, #FB7185, #F43F5E); color: white; }
+
+    .card h2 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .card .subtitle {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #64748B;
+    }
+    .card p {
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: #475569;
+      margin: 0.5rem 0 0.9rem;
+      font-weight: 600;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+    .tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+    }
+    .math .tag { background: #E0F2FE; color: #0369A1; }
+    .portuguese .tag { background: #FFE4E6; color: #BE123C; }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stars {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #F59E0B;
+    }
+    .stars span {
+      font-size: 0.78rem;
+      color: #64748B;
+      font-weight: 700;
+      margin-left: 0.2rem;
+    }
+
+    .btn-play {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: linear-gradient(135deg, #FF6B9D, #F43F5E);
+      color: white;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.55rem 1.15rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 5px 16px rgba(244, 63, 94, 0.35);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .math .btn-play {
+      background: linear-gradient(135deg, #0EA5E9, #0284C7);
+      box-shadow: 0 5px 16px rgba(14, 165, 233, 0.35);
+    }
+    .btn-play:hover { transform: scale(1.08); }
+    .btn-play:active { transform: scale(0.96); }
+
+    .how {
+      max-width: 680px;
+      margin: 2.2rem auto 0;
+      padding: 0 1.2rem;
+    }
+    .how-card {
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 1.3rem 1.2rem 1.4rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      border: 2px solid rgba(255,255,255,0.8);
+    }
+    .how-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+    .step { text-align: center; padding: 0.4rem 0.2rem; }
+    .step-num {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: white;
+      margin: 0 auto 0.45rem;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+    }
+    .step:nth-child(1) .step-num { background: linear-gradient(135deg, #06D6A0, #059669); }
+    .step:nth-child(2) .step-num { background: linear-gradient(135deg, #FFD166, #F59E0B); }
+    .step:nth-child(3) .step-num { background: linear-gradient(135deg, #A78BFA, #7C3AED); }
+    .step p {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #475569;
+      line-height: 1.3;
+    }
+
+    .kids {
+      text-align: center;
+      margin-top: 1.8rem;
+      padding-bottom: 1.8rem;
+    }
+    .kids-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .kid {
+      font-size: 1.9rem;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: default;
+    }
+    .kid:hover { transform: scale(1.3) rotate(-8deg); }
+    .footer-text {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #7C6A8A;
+    }
+    .footer-text span { color: #FF6B9D; }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.3rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(255,255,255,0.85);
+      border: none;
+      border-radius: 999px;
+      padding: 0.5rem 1rem;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #5A4A6A;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+    .btn-back:hover { transform: scale(1.05); }
+
+    .level-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      text-align: center;
+      margin: 0.5rem 0 1.5rem;
+    }
+
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 1.2rem 2rem;
+    }
+
+    .level-card {
+      background: white;
+      border-radius: 22px;
+      padding: 1.4rem 1.2rem;
+      text-align: center;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .level-card:hover {
+      transform: translateY(-6px) scale(1.03);
+    }
+    .level-card.easy { border-color: #86EFAC; background: linear-gradient(145deg, #F0FDF4, #DCFCE7); }
+    .level-card.medium { border-color: #FCD34D; background: linear-gradient(145deg, #FFFBEB, #FEF3C7); }
+    .level-card.hard { border-color: #F9A8D4; background: linear-gradient(145deg, #FDF2F8, #FCE7F3); }
+
+    .level-emoji {
+      font-size: 2.4rem;
+      margin-bottom: 0.4rem;
+    }
+    .level-card h3 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.25rem;
+      margin-bottom: 0.25rem;
+    }
+    .level-card p {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748B;
+      margin-bottom: 0.8rem;
+    }
+    .level-stars {
+      font-size: 1.1rem;
+      color: #F59E0B;
+    }
+
+    .game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .progress-wrap {
+      flex: 1;
+      margin: 0 1rem;
+    }
+    .progress-bar {
+      height: 10px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #06D6A0, #4ECDC4);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+    .score-box {
+      background: white;
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #F59E0B;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .question-card {
+      max-width: 520px;
+      margin: 1.5rem auto 0;
+      padding: 0 1.2rem;
+    }
+    .question-box {
+      background: white;
+      border-radius: 28px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.1);
+      border: 3px solid #E0E7FF;
+      position: relative;
+    }
+    .question-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #64748B;
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .question-text {
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 600;
+      color: var(--deep);
+      margin-bottom: 1.6rem;
+      line-height: 1.25;
+      min-height: 3.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .blank {
+      display: inline-block;
+      min-width: 70px;
+      border-bottom: 4px dashed #A78BFA;
+      margin: 0 4px;
+      color: #A78BFA;
+      font-weight: 700;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    .option-btn {
+      background: linear-gradient(145deg, #F8FAFC, #F1F5F9);
+      border: 3px solid #E2E8F0;
+      border-radius: 18px;
+      padding: 1rem 0.8rem;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--deep);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .option-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      border-color: #A78BFA;
+      background: #F5F3FF;
+    }
+    .option-btn.correct {
+      background: linear-gradient(145deg, #D1FAE5, #A7F3D0);
+      border-color: #10B981;
+      color: #065F46;
+      transform: scale(1.05);
+    }
+    .option-btn.wrong {
+      background: linear-gradient(145deg, #FEE2E2, #FECACA);
+      border-color: #EF4444;
+      color: #991B1B;
+      animation: shake 0.4s ease;
+    }
+    .option-btn:disabled { cursor: default; opacity: 0.85; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+
+    .feedback {
+      margin-top: 1.2rem;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-height: 1.8rem;
+      transition: opacity 0.3s;
+    }
+    .feedback.good { color: #059669; }
+    .feedback.bad { color: #DC2626; }
+
+    .result-card {
+      max-width: 420px;
+      margin: 2rem auto;
+      padding: 0 1.2rem;
+      text-align: center;
+    }
+    .result-box {
+      background: white;
+      border-radius: 28px;
+      padding: 2.2rem 1.6rem;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+      border: 3px solid #FDE68A;
+    }
+    .result-emoji {
+      font-size: 4rem;
+      margin-bottom: 0.5rem;
+      animation: bounce-soft 2s ease-in-out infinite;
+    }
+    .result-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .result-score {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #64748B;
+      margin-bottom: 1.2rem;
+    }
+    .result-stars {
+      font-size: 2.2rem;
+      margin-bottom: 1.4rem;
+      letter-spacing: 0.15em;
+    }
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B9D, #F43F5E);
+      color: white;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(244, 63, 94, 0.35);
+      transition: transform 0.25s;
+    }
+    .btn-primary:hover { transform: scale(1.05); }
+    .btn-secondary {
+      background: white;
+      color: #5A4A6A;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 999px;
+      border: 2px solid #E2E8F0;
+      cursor: pointer;
+      transition: transform 0.25s;
+    }
+    .btn-secondary:hover { transform: scale(1.04); }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      top: -20px;
+      z-index: 100;
+      animation: confetti-fall 2.5s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translateY(0) rotate(0); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    .install-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #FF6B9D, #A78BFA);
+      color: white;
+      padding: 1rem 1.2rem;
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      z-index: 1000;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.15);
+      animation: slideUp 0.4s ease;
+    }
+    .install-banner.show { display: flex; }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .install-banner p {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: 1.3;
+      flex: 1;
+    }
+    .install-banner .btn-install {
+      background: white;
+      color: #FF6B9D;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
+    }
+    .install-banner .btn-install:hover { transform: scale(1.05); }
+    .install-banner .btn-close-install {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 0.2rem;
+      opacity: 0.85;
+      line-height: 1;
+    }
+
+    @media (max-width: 640px) {
+      .steps { grid-template-columns: 1fr; gap: 0.8rem; }
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        text-align: left;
+        padding: 0.3rem 0.4rem;
+      }
+      .step-num { margin: 0; flex-shrink: 0; }
+      .options { grid-template-columns: 1fr; }
+      .mascot { width: 85px; height: 85px; }
+      .owl { font-size: 2.9rem; }
+    }
   </style>
 </head>
 <body>
-  <h1>🦉 AprendeBrincando</h1>
-  <p>O arquivo completo do jogo será atualizado em seguida.</p>
-  <p>Baixe o ZIP do projeto ou aguarde a atualização completa.</p>
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+  <div class="float-item float-1">⭐</div>
+  <div class="float-item float-2">📚</div>
+  <div class="float-item float-3">➕</div>
+  <div class="float-item float-4">✏️</div>
+  <div class="float-item float-5">🔢</div>
+  <div class="float-item float-6">✨</div>
+
+  <div id="home" class="screen active">
+    <header class="hero">
+      <div class="mascot-wrap">
+        <div class="mascot"><span class="owl">🦉</span></div>
+        <span class="sparkle sparkle-1">✨</span>
+        <span class="sparkle sparkle-2">💫</span>
+      </div>
+      <h1>AprendeBrincando</h1>
+      <p class="tagline">
+        <span>✨</span> Aprenda matemática e português de forma divertida! <span>✨</span>
+      </p>
+    </header>
+
+    <main class="subjects">
+      <article class="card math" onclick="showLevels('math')">
+        <div class="card-header">
+          <div class="icon-box">🔢</div>
+          <div>
+            <h2>Matemática</h2>
+            <div class="subtitle">Números e operações</div>
+          </div>
+        </div>
+        <p>Pratique soma, subtração, multiplicação e divisão com desafios super divertidos!</p>
+        <div class="tags">
+          <span class="tag">➕ Soma</span>
+          <span class="tag">➖ Subtração</span>
+          <span class="tag">✖️ Multiplicação</span>
+          <span class="tag">➗ Divisão</span>
+        </div>
+        <div class="card-footer">
+          <div class="stars">⭐⭐⭐ <span>3 níveis</span></div>
+          <button class="btn-play" onclick="event.stopPropagation(); showLevels('math')">Jogar 🚀</button>
+        </div>
+      </article>
+
+      <article class="card portuguese" onclick="showLevels('portuguese')">
+        <div class="card-header">
+          <div class="icon-box">📚</div>
+          <div>
+            <h2>Português</h2>
+            <div class="subtitle">Palavras e letras</div>
+          </div>
+        </div>
+        <p>Complete palavras, descubra sílabas e aprenda a escrever corretamente!</p>
+        <div class="tags">
+          <span class="tag">✏️ Palavras</span>
+          <span class="tag">🔵 Sílabas</span>
+          <span class="tag">📝 Ortografia</span>
+        </div>
+        <div class="card-footer">
+          <div class="stars">⭐⭐⭐ <span>3 níveis</span></div>
+          <button class="btn-play" onclick="event.stopPropagation(); showLevels('portuguese')">Jogar 🚀</button>
+        </div>
+      </article>
+    </main>
+
+    <section class="how">
+      <div class="how-card">
+        <h3 class="how-title"><span>🎮</span> Como funciona?</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <p>Escolha a matéria</p>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <p>Responda as perguntas</p>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <p>Ganhe estrelas!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="kids">
+      <div class="kids-row">
+        <span class="kid">👦</span>
+        <span class="kid">👧</span>
+        <span class="kid">🧒</span>
+        <span class="kid">👩</span>
+        <span class="kid">🧒</span>
+      </div>
+      <p class="footer-text">Feito com <span>❤️</span> para crianças aprenderem brincando</p>
+    </footer>
+  </div>
+
+  <div id="levels" class="screen">
+    <div class="top-bar">
+      <button class="btn-back" onclick="showScreen('home')">← Voltar</button>
+      <div style="width: 80px;"></div>
+    </div>
+    <h2 class="level-title" id="levelTitle">Escolha o nível</h2>
+    <div class="level-grid" id="levelGrid"></div>
+  </div>
+
+  <div id="game" class="screen">
+    <div class="game-header">
+      <button class="btn-back" onclick="quitGame()">← Sair</button>
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="score-box">⭐ <span id="currentScore">0</span></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-box">
+        <div class="question-label" id="questionLabel">Pergunta 1 de 8</div>
+        <div class="question-text" id="questionText"></div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="result" class="screen">
+    <div class="result-card">
+      <div class="result-box">
+        <div class="result-emoji" id="resultEmoji">🎉</div>
+        <h2 class="result-title" id="resultTitle">Incrível!</h2>
+        <p class="result-score" id="resultScore">Você acertou 7 de 8!</p>
+        <div class="result-stars" id="resultStars">⭐⭐⭐</div>
+        <div class="result-actions">
+          <button class="btn-primary" onclick="playAgain()">Jogar de novo 🚀</button>
+          <button class="btn-secondary" onclick="showScreen('home')">Voltar ao início</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSubject = null;
+    let currentLevel = null;
+    let questions = [];
+    let currentQ = 0;
+    let score = 0;
+    let answered = false;
+
+    const mathOps = {
+      easy: [
+        { a: 2, b: 3, op: '+' }, { a: 5, b: 1, op: '+' }, { a: 4, b: 4, op: '+' },
+        { a: 7, b: 2, op: '+' }, { a: 6, b: 3, op: '+' }, { a: 8, b: 1, op: '+' },
+        { a: 9, b: 0, op: '+' }, { a: 3, b: 5, op: '+' },
+        { a: 5, b: 2, op: '-' }, { a: 8, b: 3, op: '-' }, { a: 6, b: 1, op: '-' },
+        { a: 9, b: 4, op: '-' }, { a: 7, b: 5, op: '-' }, { a: 4, b: 2, op: '-' },
+        { a: 10, b: 6, op: '-' }, { a: 8, b: 8, op: '-' }
+      ],
+      medium: [
+        { a: 12, b: 7, op: '+' }, { a: 15, b: 8, op: '+' }, { a: 9, b: 14, op: '+' },
+        { a: 23, b: 6, op: '+' }, { a: 18, b: 11, op: '+' }, { a: 27, b: 9, op: '+' },
+        { a: 16, b: 5, op: '-' }, { a: 25, b: 8, op: '-' }, { a: 30, b: 12, op: '-' },
+        { a: 19, b: 7, op: '-' }, { a: 4, b: 3, op: '×' }, { a: 5, b: 4, op: '×' },
+        { a: 6, b: 3, op: '×' }, { a: 7, b: 2, op: '×' }, { a: 8, b: 4, op: '×' },
+        { a: 9, b: 3, op: '×' }
+      ],
+      hard: [
+        { a: 8, b: 7, op: '×' }, { a: 9, b: 6, op: '×' }, { a: 7, b: 8, op: '×' },
+        { a: 12, b: 4, op: '×' }, { a: 11, b: 5, op: '×' }, { a: 6, b: 9, op: '×' },
+        { a: 36, b: 6, op: '÷' }, { a: 48, b: 8, op: '÷' }, { a: 27, b: 3, op: '÷' },
+        { a: 56, b: 7, op: '÷' }, { a: 45, b: 9, op: '÷' }, { a: 64, b: 8, op: '÷' },
+        { a: 35, b: 18, op: '+' }, { a: 42, b: 17, op: '-' }, { a: 9, b: 8, op: '×' },
+        { a: 72, b: 9, op: '÷' }
+      ]
+    };
+
+    const portugueseData = {
+      easy: [
+        { type: 'complete', word: 'C_SA', answer: 'A', options: ['A', 'E', 'I', 'O'], full: 'CASA' },
+        { type: 'complete', word: 'B_LA', answer: 'O', options: ['A', 'E', 'O', 'U'], full: 'BOLA' },
+        { type: 'complete', word: 'G_TO', answer: 'A', options: ['A', 'E', 'I', 'O'], full: 'GATO' },
+        { type: 'complete', word: 'P_TO', answer: 'A', options: ['A', 'E', 'I', 'O'], full: 'PATO' },
+        { type: 'complete', word: 'M_SA', answer: 'E', options: ['A', 'E', 'I', 'O'], full: 'MESA' },
+        { type: 'complete', word: 'L_VRO', answer: 'I', options: ['A', 'E', 'I', 'O'], full: 'LIVRO' },
+        { type: 'syllable', word: 'CA-SA', answer: '2', options: ['1', '2', '3', '4'], full: 'CASA tem 2 sílabas' },
+        { type: 'syllable', word: 'BO-LA', answer: '2', options: ['1', '2', '3', '4'], full: 'BOLA tem 2 sílabas' },
+        { type: 'syllable', word: 'GA-TO', answer: '2', options: ['1', '2', '3', '4'], full: 'GATO tem 2 sílabas' },
+        { type: 'syllable', word: 'SO-L', answer: '1', options: ['1', '2', '3', '4'], full: 'SOL tem 1 sílaba' }
+      ],
+      medium: [
+        { type: 'complete', word: 'ES_OLA', answer: 'C', options: ['C', 'S', 'Z', 'X'], full: 'ESCOLA' },
+        { type: 'complete', word: 'JA_ELA', answer: 'N', options: ['N', 'M', 'L', 'R'], full: 'JANELA' },
+        { type: 'complete', word: 'CA_ELO', answer: 'B', options: ['B', 'P', 'V', 'D'], full: 'CABELO' },
+        { type: 'complete', word: 'BRIN_AR', answer: 'C', options: ['C', 'S', 'Ç', 'X'], full: 'BRINCAR' },
+        { type: 'syllable', word: 'ES-CO-LA', answer: '3', options: ['2', '3', '4', '5'], full: 'ESCOLA tem 3 sílabas' },
+        { type: 'syllable', word: 'JA-NE-LA', answer: '3', options: ['2', '3', '4', '5'], full: 'JANELA tem 3 sílabas' },
+        { type: 'syllable', word: 'CA-DEI-RA', answer: '3', options: ['2', '3', '4', '5'], full: 'CADEIRA tem 3 sílabas' },
+        { type: 'spelling', word: 'Qual a forma correta?', answer: 'CASA', options: ['CASA', 'KASA', 'CAZA', 'CASSA'], full: 'CASA' },
+        { type: 'spelling', word: 'Qual a forma correta?', answer: 'BOLA', options: ['BOLA', 'BOLLA', 'BOULA', 'BÓLA'], full: 'BOLA' },
+        { type: 'spelling', word: 'Qual a forma correta?', answer: 'AMIGO', options: ['AMIGO', 'AMIGU', 'AMJGO', 'AMIGÓ'], full: 'AMIGO' }
+      ],
+      hard: [
+        { type: 'complete', word: 'BI_ICLETA', answer: 'C', options: ['C', 'S', 'Ç', 'SS'], full: 'BICICLETA' },
+        { type: 'complete', word: 'CHO_OLATE', answer: 'C', options: ['C', 'K', 'Q', 'G'], full: 'CHOCOLATE' },
+        { type: 'complete', word: 'ELE_ANTE', answer: 'F', options: ['F', 'V', 'PH', 'P'], full: 'ELEFANTE' },
+        { type: 'syllable', word: 'BI-CI-CLE-TA', answer: '4', options: ['3', '4', '5', '6'], full: 'BICICLETA tem 4 sílabas' },
+        { type: 'syllable', word: 'CHO-CO-LA-TE', answer: '4', options: ['3', '4', '5', '6'], full: 'CHOCOLATE tem 4 sílabas' },
+        { type: 'spelling', word: 'Qual a forma correta?', answer: 'CACHORRO', options: ['CACHORRO', 'CAXORRO', 'CACHORO', 'CASHORRO'], full: 'CACHORRO' },
+        { type: 'spelling', word: 'Qual a forma correta?', answer: 'BORBOLETA', options: ['BORBOLETA', 'BORBOLETTA', 'BORBULETA', 'BORBOLETA'], full: 'BORBOLETA' },
+        { type: 'spelling', word: 'Qual a forma correta?', answer: 'PASSARINHO', options: ['PASSARINHO', 'PAÇARINHO', 'PASARINHO', 'PASSARINHO'], full: 'PASSARINHO' },
+        { type: 'spelling', word: 'Qual a forma correta?', answer: 'LIVRO', options: ['LIVRO', 'LIVRU', 'LIBRO', 'LIURO'], full: 'LIVRO' },
+        { type: 'spelling', word: 'Qual a forma correta?', answer: 'ESCOLA', options: ['ESCOLA', 'ESHOLA', 'ESZOLA', 'ESCOLA'], full: 'ESCOLA' }
+      ]
+    };
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function calc(a, b, op) {
+      if (op === '+') return a + b;
+      if (op === '-') return a - b;
+      if (op === '×') return a * b;
+      if (op === '÷') return a / b;
+      return 0;
+    }
+
+    function makeMathQuestion(item) {
+      const correct = calc(item.a, item.b, item.op);
+      let opts = new Set([correct]);
+      while (opts.size < 4) {
+        const delta = Math.floor(Math.random() * 6) + 1;
+        const wrong = Math.random() > 0.5 ? correct + delta : Math.max(0, correct - delta);
+        opts.add(wrong);
+      }
+      return {
+        text: `${item.a} ${item.op} ${item.b} = ?`,
+        answer: String(correct),
+        options: shuffle([...opts].map(String))
+      };
+    }
+
+    function makePortugueseQuestion(item) {
+      if (item.type === 'complete') {
+        return {
+          text: `Complete: <span class="blank">${item.word}</span>`,
+          answer: item.answer,
+          options: shuffle(item.options),
+          full: item.full
+        };
+      }
+      if (item.type === 'syllable') {
+        return {
+          text: `Quantas sílabas tem?<br><strong>${item.word}</strong>`,
+          answer: item.answer,
+          options: shuffle(item.options),
+          full: item.full
+        };
+      }
+      return {
+        text: item.word,
+        answer: item.answer,
+        options: shuffle(item.options),
+        full: item.full
+      };
+    }
+
+    function showLevels(subject) {
+      currentSubject = subject;
+      const title = subject === 'math' ? '🔢 Matemática' : '📚 Português';
+      document.getElementById('levelTitle').textContent = title + ' – Escolha o nível';
+
+      const grid = document.getElementById('levelGrid');
+      grid.innerHTML = `
+        <div class="level-card easy" onclick="startGame('easy')">
+          <div class="level-emoji">🌱</div>
+          <h3>Fácil</h3>
+          <p>${subject === 'math' ? 'Somas e subtrações simples' : 'Palavras curtas e sílabas'}</p>
+          <div class="level-stars">⭐</div>
+        </div>
+        <div class="level-card medium" onclick="startGame('medium')">
+          <div class="level-emoji">🌟</div>
+          <h3>Médio</h3>
+          <p>${subject === 'math' ? 'Números maiores e multiplicação' : 'Palavras médias e ortografia'}</p>
+          <div class="level-stars">⭐⭐</div>
+        </div>
+        <div class="level-card hard" onclick="startGame('hard')">
+          <div class="level-emoji">🔥</div>
+          <h3>Difícil</h3>
+          <p>${subject === 'math' ? 'Multiplicação e divisão' : 'Palavras longas e ortografia'}</p>
+          <div class="level-stars">⭐⭐⭐</div>
+        </div>
+      `;
+      showScreen('levels');
+    }
+
+    function startGame(level) {
+      currentLevel = level;
+      currentQ = 0;
+      score = 0;
+      answered = false;
+
+      if (currentSubject === 'math') {
+        const pool = shuffle(mathOps[level]).slice(0, 8);
+        questions = pool.map(makeMathQuestion);
+      } else {
+        const pool = shuffle(portugueseData[level]).slice(0, 8);
+        questions = pool.map(makePortugueseQuestion);
+      }
+
+      document.getElementById('currentScore').textContent = '0';
+      document.getElementById('progressFill').style.width = '0%';
+      showScreen('game');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      answered = false;
+      const q = questions[currentQ];
+      document.getElementById('questionLabel').textContent = `Pergunta ${currentQ + 1} de ${questions.length}`;
+      document.getElementById('questionText').innerHTML = q.text;
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('feedback').className = 'feedback';
+
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(opt, btn);
+        opts.appendChild(btn);
+      });
+
+      const progress = (currentQ / questions.length) * 100;
+      document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    function checkAnswer(selected, btn) {
+      if (answered) return;
+      answered = true;
+
+      const q = questions[currentQ];
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(b => b.disabled = true);
+
+      const feedback = document.getElementById('feedback');
+
+      if (selected === q.answer) {
+        score++;
+        btn.classList.add('correct');
+        feedback.textContent = '🎉 Acertou! Muito bem!';
+        feedback.className = 'feedback good';
+        document.getElementById('currentScore').textContent = score;
+        launchConfetti();
+      } else {
+        btn.classList.add('wrong');
+        buttons.forEach(b => {
+          if (b.textContent === q.answer) b.classList.add('correct');
+        });
+        feedback.textContent = q.full ? `Ops! A resposta era: ${q.full}` : `Ops! A resposta era: ${q.answer}`;
+        feedback.className = 'feedback bad';
+      }
+
+      setTimeout(() => {
+        currentQ++;
+        if (currentQ < questions.length) {
+          renderQuestion();
+        } else {
+          showResult();
+        }
+      }, 1400);
+    }
+
+    function showResult() {
+      const total = questions.length;
+      const pct = score / total;
+      let emoji = '🎉';
+      let title = 'Incrível!';
+      let stars = '⭐⭐⭐';
+
+      if (pct === 1) {
+        emoji = '🏆';
+        title = 'Perfeito!';
+        stars = '⭐⭐⭐';
+      } else if (pct >= 0.75) {
+        emoji = '🌟';
+        title = 'Muito bem!';
+        stars = '⭐⭐⭐';
+      } else if (pct >= 0.5) {
+        emoji = '😊';
+        title = 'Bom trabalho!';
+        stars = '⭐⭐';
+      } else {
+        emoji = '💪';
+        title = 'Continue tentando!';
+        stars = '⭐';
+      }
+
+      document.getElementById('resultEmoji').textContent = emoji;
+      document.getElementById('resultTitle').textContent = title;
+      document.getElementById('resultScore').textContent = `Você acertou ${score} de ${total}!`;
+      document.getElementById('resultStars').textContent = stars;
+      document.getElementById('progressFill').style.width = '100%';
+      showScreen('result');
+
+      if (pct >= 0.75) launchConfetti(40);
+    }
+
+    function playAgain() {
+      startGame(currentLevel);
+    }
+
+    function quitGame() {
+      showScreen('home');
+    }
+
+    function launchConfetti(count = 25) {
+      const colors = ['#FF6B9D', '#FFD166', '#06D6A0', '#4ECDC4', '#A78BFA', '#F472B6'];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        el.style.width = (6 + Math.random() * 8) + 'px';
+        el.style.height = (6 + Math.random() * 8) + 'px';
+        el.style.animationDuration = (1.8 + Math.random() * 1.5) + 's';
+        el.style.animationDelay = (Math.random() * 0.3) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 3500);
+      }
+    }
+
+    // PWA
+    let deferredPrompt = null;
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('SW registered:', reg.scope))
+          .catch((err) => console.warn('SW registration failed:', err));
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      setTimeout(() => {
+        const banner = document.getElementById('installBanner');
+        if (banner && !window.matchMedia('(display-mode: standalone)').matches) {
+          banner.classList.add('show');
+        }
+      }, 2500);
+    });
+
+    function installApp() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choice) => {
+        deferredPrompt = null;
+        document.getElementById('installBanner').classList.remove('show');
+      });
+    }
+
+    function closeInstallBanner() {
+      document.getElementById('installBanner').classList.remove('show');
+      sessionStorage.setItem('installDismissed', '1');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.matchMedia('(display-mode: standalone)').matches ||
+          sessionStorage.getItem('installDismissed')) {
+        const banner = document.getElementById('installBanner');
+        if (banner) banner.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      const banner = document.getElementById('installBanner');
+      if (banner) banner.classList.remove('show');
+    });
+  </script>
+
+  <div class="install-banner" id="installBanner">
+    <p>📱 Instale o AprendeBrincando no seu celular!</p>
+    <button class="btn-install" onclick="installApp()">Instalar</button>
+    <button class="btn-close-install" onclick="closeInstallBanner()" aria-label="Fechar">✕</button>
+  </div>
 </body>
 </html>
